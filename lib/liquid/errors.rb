@@ -23,11 +23,14 @@ module Liquid
 
     def message_prefix
       str = +""
-      str << if is_a?(SyntaxError)
-        "Liquid syntax error"
-      else
-        "Liquid error"
-      end
+      str <<
+        if is_a?(SyntaxError)
+          "Liquid syntax error"
+        elsif is_a?(MemoryError)
+          "Liquid memory limit error"
+        else
+          "Liquid error"
+        end
 
       if line_number
         str << " ("
@@ -40,6 +43,12 @@ module Liquid
     end
   end
 
+  class MemoryError < Error
+    RENDER_LENGTH_ERROR_MESSAGE = 'Render length limits exceeded.'
+    RENDER_SCORE_ERROR_MESSAGE = 'Render score limits exceeded.'
+    ASSIGN_SCORE_ERROR_MESSAGE = 'Assign score limits exceeded.'
+  end
+
   ArgumentError       = Class.new(Error)
   ContextError        = Class.new(Error)
   FileSystemError     = Class.new(Error)
@@ -47,7 +56,6 @@ module Liquid
   SyntaxError         = Class.new(Error)
   StackLevelError     = Class.new(Error)
   TaintedError        = Class.new(Error)
-  MemoryError         = Class.new(Error)
   ZeroDivisionError   = Class.new(Error)
   FloatDomainError    = Class.new(Error)
   UndefinedVariable   = Class.new(Error)
